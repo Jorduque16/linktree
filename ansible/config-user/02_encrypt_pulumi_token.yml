@@ -1,0 +1,15 @@
+# Se debe ejecutar desde el usuario nuevo
+#
+# ansible-playbook 02_encrypt_pulumi_token.yml -i inventory
+#
+
+- hosts: my_host
+  gather_facts: no
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+   - name: kms encrypt, use only if the key is rotated
+     debug:
+       msg: "{{ 'valor a encriptar acá' | kms_encrypt(KMS_KEY) }}"

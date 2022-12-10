@@ -1,0 +1,58 @@
+# Se debe ejecutar desde el usuario personal
+#
+# ansible-playbook 01_create_user.yml --extra-vars "LOCALUSER=$(whoami)"
+#
+
+- hosts: localhost
+
+  vars:
+    ACCOUNT_ID: 623666585847
+    USER:  infra-andrea-portfolio
+    GROUP: "{{ LOCALUSER }}"
+    HOME:  "/home/{{USER}}"
+
+  tasks:
+    -
+    - name: create user
+      user:
+        name:   "{{ USER }}"
+        group:  "{{ GROUP }}"
+        append: true
+        shell:  "{{ansible_user_shell}}"
+        system: true
+
+    - name: create dirs
+      file:
+        path:  "{{ HOME }}/{{ item }}"
+        state: "directory"
+        owner: "{{ USER }}"
+        group: "{{ GROUP }}"
+      with_items:
+        - .aws
+
+    - name: home owner
+      file:
+        path: "{{ HOME }}"
+        owner: "{{ USER }}"
+        group: "{{ GROUP }}"
+        recurse: yes
+
+    - file:
+        state: touch
+        path:  "{{ HOME }}/.aws/credentials"
+        mode:  0600
+        owner: "{{ USER }}"
+        group: "{{ GROUP }}"
+
+    - file:
+        state: touch
+        path:  "{{ HOME }}/.aws/account-number"
+        mode:  0600
+        owner: "{{ USER }}"
+        group: "{{ GROUP }}"
+
+    - copy:
+        dest: "{{ HOME }}/.aws/account-number"
+        content: |
+          [{{ USER}}]
+          account_id = {{ ACCOUNT_ID }}

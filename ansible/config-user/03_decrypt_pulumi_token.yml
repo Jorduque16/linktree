@@ -1,0 +1,15 @@
+# Se debe ejecutar desde el usuario nuevo
+#
+# ansible-playbook 03_decrypt_pulumi_token.yml -i inventory
+#
+
+- hosts: my_host
+  gather_facts: no
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: kms decrypt, use to show the pulumi token
+      debug:
+        msg: "{{ ENCRYPTED_PULUMI_TOKEN | kms_decrypt() }}"
